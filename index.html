@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#245b43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Reel Tracker">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>IDA × BizBuddy — Reel Work Tracker</title>
+<style>
+:root{color-scheme:light;--bg:#f6f6f0;--card:#fff;--ink:#202820;--muted:#73796f;--green:#245b43;--green-dark:#194331;--green-soft:#eaf2ec;--gold:#c7a45a;--line:#e6e8df;--track:#e9ece5;--shadow:0 8px 30px rgba(30,50,35,.045)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{width:min(1060px,100%);margin:0 auto;padding:42px 28px 60px}
+.topline{display:flex;align-items:center;gap:10px;margin-bottom:26px}.mark{width:34px;height:34px;border-radius:11px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;letter-spacing:-.5px}.eyebrow{font-size:11px;font-weight:750;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+h1{font-size:clamp(27px,4vw,38px);line-height:1.12;letter-spacing:-1.25px;margin:0;font-weight:730}h1 span{color:var(--green)}.sub{color:var(--muted);margin:10px 0 28px;font-size:14px}
+.overview{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 24px 20px;box-shadow:var(--shadow);margin-bottom:22px}.overview-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}.metric-label{font-size:12px;color:var(--muted);font-weight:600}.metric-value{font-size:25px;font-weight:750;letter-spacing:-.6px;margin-top:5px}.metric-value small{font-size:14px;color:var(--muted);font-weight:550;letter-spacing:0}.stats{display:flex;gap:32px}.percentage{font-size:28px;font-weight:750;color:var(--green);letter-spacing:-1px}.progress-track{height:7px;border-radius:20px;background:var(--track);overflow:hidden;margin-top:20px}.progress-fill{height:100%;width:0;background:var(--green);border-radius:20px;transition:width .22s ease}.progress-caption{display:flex;justify-content:space-between;gap:12px;margin-top:9px;font-size:11px;color:var(--muted)}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:26px 0 14px}.tabs{display:flex;gap:5px;background:#eceee7;border:1px solid #e4e6dd;padding:4px;border-radius:12px}.tab{border:0;background:transparent;color:#626b60;font:inherit;font-size:13px;font-weight:650;padding:10px 14px;border-radius:9px;cursor:pointer;white-space:nowrap}.tab[aria-selected=true]{background:#fff;color:var(--green-dark);box-shadow:0 1px 4px #1b332011}.tab-count{display:inline-grid;place-items:center;margin-left:5px;font-size:10px;color:inherit;background:#00000008;border-radius:6px;padding:2px 5px}
+.search-wrap{position:relative;width:min(255px,40%)}.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#858b81;font-size:17px;pointer-events:none}.search{width:100%;border:1px solid var(--line);background:#fff;border-radius:11px;padding:11px 13px 11px 36px;color:var(--ink);font:inherit;font-size:13px;outline:none}.search:focus{border-color:#8ba997;box-shadow:0 0 0 3px #245b4312}
+.list-head{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 10px;color:var(--muted);font-size:11px;font-weight:650;letter-spacing:.2px}.reel-list{display:grid;gap:9px}.reel{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:17px 18px;box-shadow:0 2px 9px #182b1805}.reel-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:15px}.reel-name{display:flex;align-items:center;gap:11px;min-width:0}.number{flex:0 0 29px;width:29px;height:29px;display:grid;place-items:center;border-radius:9px;background:#f1f3ed;color:#727a6e;font-size:11px;font-weight:750}.name{font-size:14px;font-weight:670;line-height:1.4;overflow-wrap:anywhere}.status{font-size:11px;font-weight:650;color:#7a8076;white-space:nowrap;border-radius:20px;padding:6px 9px;background:#f3f4ef}.status.progress{color:var(--green);background:var(--green-soft)}.status.complete{color:#fff;background:var(--green)}
+.stages{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.stage{display:flex;align-items:center;gap:8px;min-width:0;color:#666e63;font-size:11px;line-height:1.3;cursor:pointer;user-select:none}.stage input{appearance:none;flex:0 0 16px;width:16px;height:16px;margin:0;border:1.5px solid #cbd0c5;border-radius:5px;background:#fff;display:grid;place-items:center;cursor:pointer;transition:background .15s,border-color .15s}.stage input:checked{background:var(--green);border-color:var(--green)}.stage input:checked:after{content:"";width:7px;height:4px;border-left:1.8px solid white;border-bottom:1.8px solid white;transform:rotate(-45deg) translate(1px,-1px)}.stage:has(input:checked){color:#334c3c}.stage input:focus-visible{outline:3px solid #c9ddce;outline-offset:2px}
+.empty{background:#fff;border:1px dashed var(--line);border-radius:15px;text-align:center;padding:38px 20px;color:var(--muted);font-size:13px}.footer{display:flex;justify-content:space-between;gap:15px;margin-top:18px;color:#858b80;font-size:11px}.saved{display:flex;align-items:center;gap:6px}.saved:before{content:"";width:6px;height:6px;background:#79a585;border-radius:50%}
+@media(max-width:700px){.wrap{padding:27px 16px 40px}.sub{margin-bottom:21px}.overview{padding:18px}.stats{gap:22px}.metric-value{font-size:22px}.toolbar{align-items:stretch;flex-direction:column}.tabs{width:100%}.tab{flex:1;padding:10px 8px;font-size:12px}.search-wrap{width:100%}.reel{padding:15px}.stages{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 10px}.stage:last-child{grid-column:1 / -1}.reel-top{margin-bottom:16px}.name{font-size:13px}.footer{flex-direction:column;gap:8px}}
+@media(max-width:370px){.wrap{padding-inline:11px}.stats{gap:14px}.metric-value{font-size:20px}.overview-head{gap:8px}.percentage{font-size:24px}.stage{font-size:10.5px}.reel{padding:13px}.tab{font-size:11px}}
+button,input{ -webkit-tap-highlight-color:transparent }
+@media(max-width:700px){
+  .stage{min-height:36px}
+  .stage input{flex-basis:20px;width:20px;height:20px}
+  .tab{min-height:42px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="topline"><div class="mark" aria-hidden="true">IDA</div><div class="eyebrow">Creative production workspace</div></div>
+  <h1>Reel Work <span>Tracker</span></h1>
+  <p class="sub">One clear workflow. Track every reel across both brands.</p>
+
+
+  <section class="overview" id="syncPanel" aria-label="Cloud sync" style="margin-top:-6px">
+    <div class="overview-head" style="align-items:center">
+      <div>
+        <div class="metric-label">CLOUD SYNC</div>
+        <div style="font-weight:700;margin-top:5px" id="syncHeading">Use on your iPhone and laptop</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5" id="syncMessage">Local mode is active. Add your Supabase project settings to sync progress between devices.</div>
+      </div>
+      <span class="status" id="syncBadge">Local only</span>
+    </div>
+    <div id="authControls" style="display:grid;gap:10px;margin-top:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+        <input id="authEmail" type="email" autocomplete="email" placeholder="Your email address" aria-label="Email address" style="min-width:0;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:13px">
+        <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password (min. 6 characters)" aria-label="Password" style="min-width:0;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:13px">
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button type="button" id="signInBtn" class="tab" style="background:var(--green);color:#fff">Sign in</button>
+        <button type="button" id="signUpBtn" class="tab" style="background:#eef2eb;color:var(--green-dark)">Create account</button>
+        <button type="button" id="signOutBtn" class="tab" style="display:none">Sign out</button>
+      </div>
+      <div id="authHint" style="font-size:11px;color:var(--muted);line-height:1.5">Cloud sync needs your own Supabase project. See SETUP-GUIDE.txt in the downloaded folder. Until then, progress is saved in this browser.</div>
+    </div>
+  </section>
+
+  <section class="overview" aria-label="Overall progress">
+    <div class="overview-head">
+      <div class="stats">
+        <div><div class="metric-label">Stages completed</div><div class="metric-value"><span id="doneStages">0</span> <small>/ 115</small></div></div>
+        <div><div class="metric-label">Reels completed</div><div class="metric-value"><span id="doneReels">0</span> <small>/ 23</small></div></div>
+      </div>
+      <div style="text-align:right"><div class="metric-label">Overall progress</div><div class="percentage" id="percent">0%</div></div>
+    </div>
+    <div class="progress-track" role="progressbar" aria-label="Overall workflow progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-caption"><span id="remaining">115 stages remaining</span><span>Across both brands</span></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="tabs" role="tablist" aria-label="Select brand">
+      <button class="tab" id="bizTab" role="tab" aria-selected="true" aria-controls="reelList" data-brand="bizbuddy">BizBuddy <span class="tab-count">13</span></button>
+      <button class="tab" id="idaTab" role="tab" aria-selected="false" aria-controls="reelList" data-brand="ida">Indian Digital Ads <span class="tab-count">10</span></button>
+    </div>
+    <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><input class="search" id="search" type="search" placeholder="Search reels..." aria-label="Search reels by name" autocomplete="off"></label>
+  </div>
+
+  <div class="list-head"><span id="listTitle">BIZBUDDY REELS</span><span id="visibleCount">13 reels</span></div>
+  <section class="reel-list" id="reelList" role="tabpanel" aria-labelledby="bizTab"></section>
+  <div class="footer"><span>Changes save automatically in this browser.</span><span class="saved" id="saveStatus" role="status" aria-live="polite">Progress saved on this device</span></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+
+/*
+  OPTIONAL CLOUD SYNC CONFIG:
+  Replace these two placeholders with your Supabase Project URL and publishable/anon key.
+  Never put a service_role or secret key in browser code.
+*/
+const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY_HERE";
+
+const STAGES = ["Prompt Creation","Scene Creation","Google Flow Video Generation","Editing","Final Upload"];
+const BRANDS = {
+  bizbuddy: [
+    "Are You Selling the Right Product?","Who Is Your Ideal Customer?","Why Should Customers Choose You?",
+    "Are You Pricing Your Product Correctly?","Quality vs Cost","Packaging Is More Than a Box",
+    "Don't Launch Without Testing","Know Your Competition","Your Product Must Evolve",
+    "Too Many Choices Can Confuse Customers","Is It the Right Time to Launch?",
+    "Can Customers Understand Your Value?","Can Your Product Scale?"
+  ],
+  ida: [
+    "Jewellery & Luxury","Skincare & Beauty","Fashion & Apparel","Restaurants & Cafes",
+    "Real Estate & Property Developers","Fitness & Gym","Perfume & Fragrance",
+    "Bakery, Sweets & Food","Hotels, Resorts & Hospitality","Interior Design & Furniture"
+  ]
+};
+const STORAGE_KEY = "ida-bizbuddy-reel-work-tracker-v1";
+const allReels = Object.entries(BRANDS).flatMap(([brand,names]) =>
+  names.map((name,index)=>({id:`${brand}-${index+1}`,brand,name,index,checks:[false,false,false,false,false]}))
+);
+let activeBrand = "bizbuddy";
+let savedData = {};
+let supabase = null;
+let currentUser = null;
+let syncChannel = null;
+let saveTimer = null;
+let isApplyingRemote = false;
+const $ = id => document.getElementById(id);
+
+function readLocal() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch (_) { return {}; }
+}
+function applyData(data) {
+  allReels.forEach(reel => {
+    const stored = data[reel.id];
+    if (Array.isArray(stored) && stored.length === STAGES.length) {
+      const firstFalse = stored.findIndex(value => value !== true);
+      reel.checks = STAGES.map((_,i) => firstFalse === -1 || i < firstFalse);
+    } else {
+      reel.checks = [false,false,false,false,false];
+    }
+  });
+}
+function collectData() {
+  const data = {};
+  allReels.forEach(reel => data[reel.id] = reel.checks);
+  return data;
+}
+function persistLocal() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+  } catch (_) {}
+}
+function isConfigured() {
+  return SUPABASE_URL.startsWith("https://") &&
+    !SUPABASE_URL.includes("PASTE_YOUR") &&
+    SUPABASE_ANON_KEY.length > 20 &&
+    !SUPABASE_ANON_KEY.includes("PASTE_YOUR") &&
+    window.supabase && window.supabase.createClient;
+}
+function setSyncState(heading, message, badge, signedIn=false) {
+  $("syncHeading").textContent = heading;
+  $("syncMessage").textContent = message;
+  $("syncBadge").textContent = badge;
+  $("syncBadge").className = "status" + (signedIn ? " complete" : "");
+  $("signInBtn").style.display = signedIn ? "none" : "inline-block";
+  $("signUpBtn").style.display = signedIn ? "none" : "inline-block";
+  $("signOutBtn").style.display = signedIn ? "inline-block" : "none";
+  $("authEmail").style.display = signedIn ? "none" : "block";
+  $("authPassword").style.display = signedIn ? "none" : "block";
+}
+function statusFor(reel) {
+  const count = reel.checks.filter(Boolean).length;
+  return count === 5 ? "complete" : count > 0 ? "progress" : "not-started";
+}
+function render() {
+  const query = $("search").value.trim().toLocaleLowerCase();
+  const list = $("reelList");
+  list.replaceChildren();
+  const reels = allReels.filter(r => r.brand === activeBrand && r.name.toLocaleLowerCase().includes(query));
+  $("listTitle").textContent = activeBrand === "bizbuddy" ? "BIZBUDDY REELS" : "INDIAN DIGITAL ADS REELS";
+  $("visibleCount").textContent = `${reels.length} ${reels.length === 1 ? "reel" : "reels"}`;
+  $("reelList").setAttribute("aria-labelledby", activeBrand === "bizbuddy" ? "bizTab" : "idaTab");
+  if (!reels.length) {
+    const empty = document.createElement("div"); empty.className = "empty";
+    empty.textContent = "No reels match your search."; list.append(empty); return;
+  }
+  reels.forEach(reel => {
+    const state = statusFor(reel);
+    const card = document.createElement("article"); card.className = "reel";
+    const top = document.createElement("div"); top.className = "reel-top";
+    const nameWrap = document.createElement("div"); nameWrap.className = "reel-name";
+    const num = document.createElement("span"); num.className = "number"; num.textContent = String(reel.index+1).padStart(2,"0");
+    const name = document.createElement("div"); name.className = "name"; name.textContent = reel.name;
+    nameWrap.append(num,name);
+    const badge = document.createElement("span"); badge.className = `status${state==="progress"?" progress":state==="complete"?" complete":""}`;
+    badge.textContent = state === "complete" ? "Complete" : state === "progress" ? "In progress" : "Not started";
+    top.append(nameWrap,badge);
+    const stages = document.createElement("div"); stages.className = "stages";
+    STAGES.forEach((stage,index) => {
+      const label = document.createElement("label"); label.className = "stage";
+      const input = document.createElement("input"); input.type = "checkbox";
+      input.checked = reel.checks[index]; input.setAttribute("aria-label",`${reel.name}: ${stage}`);
+      input.addEventListener("change", () => {
+        if (input.checked) {
+          for (let i=0;i<=index;i++) reel.checks[i] = true;
+        } else {
+          for (let i=index;i<STAGES.length;i++) reel.checks[i] = false;
+        }
+        persist(); render(); updateProgress();
+      });
+      const text = document.createElement("span"); text.textContent = stage;
+      label.append(input,text); stages.append(label);
+    });
+    card.append(top,stages); list.append(card);
+  });
+}
+function persist() {
+  persistLocal();
+  $("saveStatus").textContent = currentUser ? "Saving to cloud…" : "Progress saved on this device";
+  if (currentUser && supabase) {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveCloud, 450);
+  }
+}
+async function saveCloud() {
+  if (!currentUser || !supabase || isApplyingRemote) return;
+  const { error } = await supabase.from("workflow_progress").upsert({
+    user_id: currentUser.id,
+    data: collectData(),
+    updated_at: new Date().toISOString()
+  }, { onConflict: "user_id" });
+  if (error) {
+    $("saveStatus").textContent = "Cloud save failed — " + error.message;
+  } else {
+    $("saveStatus").textContent = "Synced to your devices";
+  }
+}
+async function loadCloud() {
+  if (!currentUser || !supabase) return;
+  $("saveStatus").textContent = "Loading cloud progress…";
+  const { data, error } = await supabase.from("workflow_progress")
+    .select("data").eq("user_id", currentUser.id).maybeSingle();
+  if (error) {
+    $("saveStatus").textContent = "Cloud load failed — check setup";
+    $("syncMessage").textContent = "Could not load cloud progress: " + error.message;
+    return;
+  }
+  if (data && data.data && typeof data.data === "object") {
+    isApplyingRemote = true;
+    applyData(data.data);
+    persistLocal();
+    render(); updateProgress();
+    isApplyingRemote = false;
+    $("saveStatus").textContent = "Synced to your devices";
+  } else {
+    // First sign-in: upload existing browser progress as the initial cloud copy.
+    await saveCloud();
+  }
+  subscribeRealtime();
+}
+function subscribeRealtime() {
+  if (!supabase || !currentUser) return;
+  if (syncChannel) supabase.removeChannel(syncChannel);
+  syncChannel = supabase.channel("workflow-progress-" + currentUser.id)
+    .on("postgres_changes", {
+      event: "*", schema: "public", table: "workflow_progress",
+      filter: "user_id=eq." + currentUser.id
+    }, payload => {
+      if (!payload.new || !payload.new.data) return;
+      isApplyingRemote = true;
+      applyData(payload.new.data);
+      persistLocal(); render(); updateProgress();
+      isApplyingRemote = false;
+      $("saveStatus").textContent = "Live sync updated";
+    }).subscribe();
+}
+async function signIn(createAccount=false) {
+  if (!supabase) {
+    $("authHint").textContent = "Supabase is not configured yet. Follow SETUP-GUIDE.txt and replace the two config placeholders in this HTML file.";
+    return;
+  }
+  const email = $("authEmail").value.trim();
+  const password = $("authPassword").value;
+  if (!email || !password) {
+    $("authHint").textContent = "Enter your email and password first.";
+    return;
+  }
+  $("authHint").textContent = createAccount ? "Creating account…" : "Signing in…";
+  const result = createAccount
+    ? await supabase.auth.signUp({email, password})
+    : await supabase.auth.signInWithPassword({email, password});
+  if (result.error) {
+    $("authHint").textContent = result.error.message;
+    return;
+  }
+  if (createAccount && !result.data.session) {
+    $("authHint").textContent = "Account created. Check your email to confirm it, then sign in.";
+    return;
+  }
+  currentUser = result.data.user;
+  if (currentUser) {
+    setSyncState("Cloud sync is connected", "Signed in as " + currentUser.email + ". Your progress syncs through Supabase.", "Cloud synced", true);
+    $("authHint").textContent = "Your workflow data is stored in your private account.";
+    await loadCloud();
+  }
+}
+async function signOut() {
+  if (supabase) await supabase.auth.signOut();
+  currentUser = null;
+  if (syncChannel) { await supabase.removeChannel(syncChannel); syncChannel = null; }
+  setSyncState("Use on your iPhone and laptop", "Signed out. This browser still has its local copy; sign in again to sync.", "Local only", false);
+  $("authHint").textContent = "You are signed out. Your local browser copy remains available.";
+  $("saveStatus").textContent = "Progress saved on this device";
+}
+function updateProgress() {
+  const doneStages = allReels.reduce((sum,reel)=>sum+reel.checks.filter(Boolean).length,0);
+  const doneReels = allReels.filter(reel=>reel.checks.every(Boolean)).length;
+  const totalStages = allReels.length * STAGES.length;
+  const percent = Math.round(doneStages/totalStages*100);
+  $("doneStages").textContent = doneStages;
+  $("doneReels").textContent = doneReels;
+  $("percent").textContent = `${percent}%`;
+  $("remaining").textContent = `${totalStages-doneStages} ${totalStages-doneStages===1?"stage":"stages"} remaining`;
+  $("progressFill").style.width = `${percent}%`;
+  $("progressBar").setAttribute("aria-valuenow",String(percent));
+  document.querySelector(".metric-value small").textContent = `/ ${totalStages}`;
+  document.querySelectorAll(".stats .metric-value small")[1].textContent = `/ ${allReels.length}`;
+}
+document.querySelectorAll(".tab[data-brand]").forEach(tab => tab.addEventListener("click",()=>{
+  activeBrand = tab.dataset.brand;
+  document.querySelectorAll(".tab[data-brand]").forEach(other=>other.setAttribute("aria-selected",String(other===tab)));
+  render();
+}));
+$("search").addEventListener("input",render);
+$("signInBtn").addEventListener("click",()=>signIn(false));
+$("signUpBtn").addEventListener("click",()=>signIn(true));
+$("signOutBtn").addEventListener("click",signOut);
+
+applyData(readLocal());
+if (isConfigured()) {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  setSyncState("Connecting to cloud…", "Checking your Supabase session.", "Connecting");
+  supabase.auth.getSession().then(async ({data, error}) => {
+    if (error) {
+      setSyncState("Cloud sync needs attention", error.message, "Error");
+      return;
+    }
+    if (data.session) {
+      currentUser = data.session.user;
+      setSyncState("Cloud sync is connected", "Signed in as " + currentUser.email + ".", "Cloud synced", true);
+      await loadCloud();
+    } else {
+      setSyncState("Sign in to sync your workflow", "Use the same account on your laptop and iPhone to share progress.", "Signed out");
+    }
+  });
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session && session.user && (!currentUser || currentUser.id !== session.user.id)) {
+      currentUser = session.user;
+      setSyncState("Cloud sync is connected", "Signed in as " + currentUser.email + ".", "Cloud synced", true);
+      setTimeout(loadCloud, 0);
+    }
+  });
+} else {
+  setSyncState("Use on your iPhone and laptop", "Local mode is active. To sync, follow SETUP-GUIDE.txt and add your Supabase project settings.", "Local only");
+}
+render(); updateProgress();
+
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(err => console.warn("PWA setup:", err)));
+}
+</script>
+</body>
+</html>

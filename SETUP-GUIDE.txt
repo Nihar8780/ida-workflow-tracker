@@ -1,0 +1,64 @@
+IDA × BizBuddy Reel Work Tracker — iPhone PWA + Cloud Sync
+==========================================================
+
+WHAT'S INCLUDED
+- index.html: your existing single-file tracker, adapted for PWA and optional Supabase cloud sync
+- manifest.json: app name, display mode and icon configuration
+- service-worker.js: basic app-shell caching
+- icons/: home-screen icons
+- supabase-setup.sql: database table and user-private access policies
+
+IMPORTANT
+The app works locally without Supabase configuration. Local progress is saved in the current browser.
+Cross-device sync will NOT work until you configure Supabase. This package does not contain any secret keys.
+
+PART A — CREATE YOUR SUPABASE PROJECT
+1. Open https://supabase.com/dashboard and create a project.
+2. Open SQL Editor.
+3. Open supabase-setup.sql from this folder, copy all its SQL, paste into SQL Editor, and run it.
+4. In Supabase project settings/API (or Connect), copy:
+   - Project URL
+   - Publishable key (or legacy anon/public key)
+   NEVER copy the service_role key or any secret key into this HTML.
+
+PART B — ADD YOUR PROJECT SETTINGS
+1. Open index.html in VS Code.
+2. Find these lines near the top of the main script:
+   const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
+   const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY_HERE";
+3. Replace the placeholder values with your Project URL and publishable/anon key.
+4. Save the file.
+
+PART C — DEPLOY
+1. Upload the whole folder contents to the same GitHub repository connected to Vercel, keeping this structure:
+   index.html
+   manifest.json
+   service-worker.js
+   supabase-setup.sql
+   icons/icon-192.png
+   icons/icon-512.png
+2. Commit and push, or import the folder into your deployment workflow.
+3. Confirm the live URL uses HTTPS and the manifest/icons are accessible.
+
+PART D — SIGN IN AND SYNC
+1. Open your deployed website.
+2. Enter your email and a strong password, then select Create account.
+3. If email confirmation is enabled, confirm the email first and then sign in.
+4. Open the same live URL on your iPhone in Safari.
+5. Sign in with the SAME account. Your workflow progress will be shared.
+6. Test by changing one stage on the laptop and checking the iPhone.
+
+DATA MIGRATION NOTE
+The first account/device to sign in when the cloud record is empty uploads that browser's current progress to Supabase. When a cloud record already exists, it is loaded over the current device's local progress. If you have important progress saved on more than one browser, choose the most complete copy before the first sync.
+
+SECURITY
+- Keep Row Level Security enabled.
+- Use only the publishable/anon key in frontend code, never a service_role/secret key.
+- Keep your Supabase account secure and use a strong password.
+- This starter stores one shared progress record per signed-in account.
+- For a public-facing production app, review authentication, password recovery, account deletion and backup policies before relying on it.
+
+LIMITATIONS
+- Offline caching is basic. Cloud saves require an internet connection.
+- If you change cached app files later, the service worker cache name can be incremented in service-worker.js.
+- This is an installable web app, not an App Store app.
