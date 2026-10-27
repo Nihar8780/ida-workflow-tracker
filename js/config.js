@@ -5,5 +5,5 @@
 // NEVER put the service_role key here.
 window.APP_CONFIG = {
   SUPABASE_URL: "YOUR_SUPABASE_URL",
-  SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_KEY"
+  SUPABASE_ANON_KEY: "sb_publishable_IHaf5HyFe6SQeZzMv5tCoA_xJgJTaMK"
 };
